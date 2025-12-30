@@ -1,0 +1,61 @@
+/* Styles personnalisés optionnels */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.badge {
+    font-size: 0.9em;
+    padding: 0.4em 0.6em;
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Animation pour les alertes */
+.alert {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.9em;
+    }
+
+    .btn-sm {
+        padding: 0.15rem 0.3rem;
+        font-size: 0.8rem;
+    }
+}
