@@ -21,24 +21,65 @@ public class EleveService {
     }
 
     public Eleve saveEleve(Eleve eleve) {
-        // Créer le dossier administratif si c'est un nouvel élève
-        if (eleve.getId() == null && eleve.getDossierAdministratif() == null) {
-            DossierAdministratif dossier = new DossierAdministratif();
-            dossier.setDateCreation(LocalDate.now());
-            eleve.setDossierAdministratif(dossier);
+        if (eleve.getId() == null) {
+            // Création d'un nouvel élève
+            return createNewEleve(eleve);
+        } else {
+            // Modification d'un élève existant
+            return updateEleve(eleve);
         }
+    }
+
+    private Eleve createNewEleve(Eleve eleve) {
+        // Créer le dossier administratif
+        DossierAdministratif dossier = new DossierAdministratif();
+        dossier.setDateCreation(LocalDate.now());
+        eleve.setDossierAdministratif(dossier);
 
         // Sauvegarder l'élève
         Eleve savedEleve = eleveRepository.save(eleve);
 
-        // Générer le numéro d'inscription si ce n'est pas déjà fait
-        if (savedEleve.getDossierAdministratif().getNumeroInscription() == null) {
-            String numero = genererNumeroInscription(savedEleve);
-            savedEleve.getDossierAdministratif().setNumeroInscription(numero);
-            savedEleve = eleveRepository.save(savedEleve);
+        // Générer le numéro d'inscription
+        String numero = genererNumeroInscription(savedEleve);
+        savedEleve.getDossierAdministratif().setNumeroInscription(numero);
+
+        return eleveRepository.save(savedEleve);
+    }
+
+    private Eleve updateEleve(Eleve eleve) {
+        // Récupérer l'élève existant avec toutes ses données
+        Eleve existingEleve = eleveRepository.findById(eleve.getId())
+                .orElseThrow(() -> new RuntimeException("Élève non trouvé avec l'id: " + eleve.getId()));
+
+        // Mettre à jour uniquement les champs modifiables
+        existingEleve.setNom(eleve.getNom());
+        existingEleve.setPrenom(eleve.getPrenom());
+
+        // Gérer le changement de filière
+        boolean filiereChanged = false;
+
+        if (eleve.getFiliere() != null) {
+            // Nouvelle filière assignée
+            if (existingEleve.getFiliere() == null ||
+                    !eleve.getFiliere().getId().equals(existingEleve.getFiliere().getId())) {
+                filiereChanged = true;
+                existingEleve.setFiliere(eleve.getFiliere());
+            }
+        } else {
+            // Filière retirée
+            if (existingEleve.getFiliere() != null) {
+                filiereChanged = true;
+                existingEleve.setFiliere(null);
+            }
         }
 
-        return savedEleve;
+        // Mettre à jour le numéro d'inscription si la filière a changé
+        if (filiereChanged && existingEleve.getDossierAdministratif() != null) {
+            String nouveauNumero = genererNumeroInscription(existingEleve);
+            existingEleve.getDossierAdministratif().setNumeroInscription(nouveauNumero);
+        }
+
+        return eleveRepository.save(existingEleve);
     }
 
     private String genererNumeroInscription(Eleve eleve) {
@@ -63,21 +104,5 @@ public class EleveService {
 
     public List<Eleve> getElevesByFiliere(Long filiereId) {
         return eleveRepository.findByFiliereId(filiereId);
-    }
-
-    public Eleve updateEleve(Long id, Eleve eleve) {
-        Eleve existingEleve = getEleveById(id);
-        existingEleve.setNom(eleve.getNom());
-        existingEleve.setPrenom(eleve.getPrenom());
-
-        // Si la filière a changé, mettre à jour le numéro d'inscription
-        if (eleve.getFiliere() != null &&
-                !eleve.getFiliere().equals(existingEleve.getFiliere())) {
-            existingEleve.setFiliere(eleve.getFiliere());
-            String nouveauNumero = genererNumeroInscription(existingEleve);
-            existingEleve.getDossierAdministratif().setNumeroInscription(nouveauNumero);
-        }
-
-        return eleveRepository.save(existingEleve);
     }
 }

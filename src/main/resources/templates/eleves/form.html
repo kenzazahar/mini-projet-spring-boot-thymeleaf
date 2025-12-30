@@ -47,9 +47,11 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/eleves/save}" th:object="${eleve}" method="post">
-                        <input type="hidden" th:field="*{id}">
+                    <form th:action="@{/eleves/save}" method="post">
+                        <!-- ID de l'élève (caché) -->
+                        <input type="hidden" th:value="${eleve.id}" name="id">
 
+                        <!-- Informations personnelles -->
                         <div class="mb-3">
                             <label for="nom" class="form-label">
                                 <i class="fas fa-user"></i> Nom *
@@ -57,7 +59,8 @@
                             <input type="text"
                                    class="form-control"
                                    id="nom"
-                                   th:field="*{nom}"
+                                   name="nom"
+                                   th:value="${eleve.nom}"
                                    placeholder="Ex: ALAMI"
                                    required>
                         </div>
@@ -69,7 +72,8 @@
                             <input type="text"
                                    class="form-control"
                                    id="prenom"
-                                   th:field="*{prenom}"
+                                   name="prenom"
+                                   th:value="${eleve.prenom}"
                                    placeholder="Ex: Ahmed"
                                    required>
                         </div>
@@ -93,9 +97,19 @@
                             </div>
                         </div>
 
+                        <!-- Information sur le dossier administratif -->
                         <div class="alert alert-info" th:if="${eleve.id == null}">
                             <i class="fas fa-info-circle"></i>
                             <strong>Note:</strong> Le dossier administratif sera créé automatiquement lors de l'enregistrement.
+                        </div>
+
+                        <div class="alert alert-warning" th:if="${eleve.id != null && eleve.dossierAdministratif != null}">
+                            <i class="fas fa-folder"></i>
+                            <strong>Dossier Administratif:</strong>
+                            <span class="badge bg-warning text-dark"
+                                  th:text="${eleve.dossierAdministratif.numeroInscription}"></span>
+                            <br>
+                            <small>Le numéro d'inscription sera mis à jour si vous changez la filière</small>
                         </div>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">

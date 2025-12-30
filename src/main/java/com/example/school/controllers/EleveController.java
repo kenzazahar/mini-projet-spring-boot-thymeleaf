@@ -37,17 +37,23 @@ public class EleveController {
     }
 
     @PostMapping("/save")
-    public String saveEleve(@ModelAttribute Eleve eleve, @RequestParam(required = false) Long filiereId) {
-        if (filiereId != null) {
+    public String saveEleve(@ModelAttribute Eleve eleve,
+                            @RequestParam(required = false) Long filiereId) {
+        // Gérer l'affectation de la filière
+        if (filiereId != null && filiereId > 0) {
             eleve.setFiliere(filiereService.getFiliereById(filiereId));
+        } else {
+            eleve.setFiliere(null);
         }
+
         eleveService.saveEleve(eleve);
         return "redirect:/eleves";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        model.addAttribute("eleve", eleveService.getEleveById(id));
+        Eleve eleve = eleveService.getEleveById(id);
+        model.addAttribute("eleve", eleve);
         model.addAttribute("filieres", filiereService.getAllFilieres());
         return "eleves/form";
     }
@@ -67,7 +73,8 @@ public class EleveController {
     }
 
     @PostMapping("/addCours/{eleveId}")
-    public String addCoursToEleve(@PathVariable Long eleveId, @RequestParam Long coursId) {
+    public String addCoursToEleve(@PathVariable Long eleveId,
+                                  @RequestParam Long coursId) {
         Eleve eleve = eleveService.getEleveById(eleveId);
         Cours cours = coursService.getCoursById(coursId);
 
@@ -80,7 +87,8 @@ public class EleveController {
     }
 
     @GetMapping("/removeCours/{eleveId}/{coursId}")
-    public String removeCoursFromEleve(@PathVariable Long eleveId, @PathVariable Long coursId) {
+    public String removeCoursFromEleve(@PathVariable Long eleveId,
+                                       @PathVariable Long coursId) {
         Eleve eleve = eleveService.getEleveById(eleveId);
         Cours cours = coursService.getCoursById(coursId);
 
