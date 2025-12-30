@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Élèves</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-graduation-cap"></i> Gestion Scolaire
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/filieres">Filières</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cours">Cours</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/eleves">Élèves</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-graduate"></i> Liste des Élèves</h2>
+        <a href="/eleves/new" class="btn btn-info">
+            <i class="fas fa-plus"></i> Nouvel Élève
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-info">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Filière</th>
+                        <th>N° Inscription</th>
+                        <th>Nb Cours</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${eleves.empty}">
+                        <td colspan="7" class="text-center text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p>Aucun élève inscrit</p>
+                        </td>
+                    </tr>
+                    <tr th:each="eleve : ${eleves}">
+                        <td th:text="${eleve.id}"></td>
+                        <td th:text="${eleve.nom}"></td>
+                        <td th:text="${eleve.prenom}"></td>
+                        <td>
+                                <span class="badge bg-info"
+                                      th:if="${eleve.filiere != null}"
+                                      th:text="${eleve.filiere.code}"></span>
+                            <span th:if="${eleve.filiere == null}" class="text-muted">Non affecté</span>
+                        </td>
+                        <td>
+                                <span class="badge bg-warning text-dark"
+                                      th:text="${eleve.dossierAdministratif?.numeroInscription}"></span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary" th:text="${eleve.cours.size()}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/eleves/details/{id}(id=${eleve.id})}"
+                               class="btn btn-sm btn-info" title="Détails">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/eleves/edit/{id}(id=${eleve.id})}"
+                               class="btn btn-sm btn-warning" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{/eleves/delete/{id}(id=${eleve.id})}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élève ?')"
+                               title="Supprimer">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
